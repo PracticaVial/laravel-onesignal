@@ -13,14 +13,13 @@ use GuzzleHttp\Psr7\Response as Psr7Response;
 
 class OneSignalClient
 {
-    const API_URL = "https://onesignal.com/api/v1";
-
     const ENDPOINT_NOTIFICATIONS = "/notifications";
     const ENDPOINT_PLAYERS = "/players";
 
     protected $client;
     protected $headers;
     protected $appId;
+    protected $restApiUrl;
     protected $restApiKey;
     protected $userAuthKey;
     protected $additionalParams;
@@ -68,11 +67,18 @@ class OneSignalClient
         return $this;
     }
 
-    public function __construct($appId, $restApiKey, $userAuthKey)
+    /**
+     * @param $appId
+     * @param $restApiUrl
+     * @param $restApiKey
+     * @param $userAuthKey
+     */
+    public function __construct($appId, $restApiUrl, $restApiKey, $userAuthKey)
     {
         $this->appId = $appId;
         $this->restApiKey = $restApiKey;
         $this->userAuthKey = $userAuthKey;
+        $this->restApiUrl = $restApiUrl;
 
         $this->client = new Client([
             'handler' => $this->createGuzzleHandler(),
@@ -393,29 +399,29 @@ class OneSignalClient
 
     public function post($endPoint) {
         if($this->requestAsync === true) {
-            $promise = $this->client->postAsync(self::API_URL . $endPoint, $this->headers);
+            $promise = $this->client->postAsync($this->restApiUrl . $endPoint, $this->headers);
             return (is_callable($this->requestCallback) ? $promise->then($this->requestCallback) : $promise);
         }
-        return $this->client->post(self::API_URL . $endPoint, $this->headers);
+        return $this->client->post($this->restApiUrl . $endPoint, $this->headers);
     }
 
     public function put($endPoint) {
         if($this->requestAsync === true) {
-            $promise = $this->client->putAsync(self::API_URL . $endPoint, $this->headers);
+            $promise = $this->client->putAsync($this->restApiUrl . $endPoint, $this->headers);
             return (is_callable($this->requestCallback) ? $promise->then($this->requestCallback) : $promise);
         }
-        return $this->client->put(self::API_URL . $endPoint, $this->headers);
+        return $this->client->put($this->restApiUrl . $endPoint, $this->headers);
     }
 
     public function get($endPoint) {
-        return $this->client->get(self::API_URL . $endPoint, $this->headers);
+        return $this->client->get($this->restApiUrl . $endPoint, $this->headers);
     }
 
     public function delete($endPoint) {
         if($this->requestAsync === true) {
-            $promise = $this->client->deleteAsync(self::API_URL . $endPoint, $this->headers);
+            $promise = $this->client->deleteAsync($this->restApiUrl . $endPoint, $this->headers);
             return (is_callable($this->requestCallback) ? $promise->then($this->requestCallback) : $promise);
         }
-        return $this->client->delete(self::API_URL . $endPoint, $this->headers);
+        return $this->client->delete($this->restApiUrl . $endPoint, $this->headers);
     }
 }
